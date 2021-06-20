@@ -1,0 +1,113 @@
+source       ../../files/07-constant_ph_testing/namdcph.tcl
+
+set outputname cphmd_out
+
+set temperature    298.0
+
+structure      = ../Box_psfgen.psf
+coordinates    = ../Box_psfgen.pdb
+bincoordinates = ../eq_out.restart.coor
+binVelocities  = ../eq_out.restart.vel
+extendedSystem = ../eq_out.restart.xsc  ;# cell dimensions from last run
+
+
+#firsttimestep   $currenttimestep
+ 
+#############################################################
+## SIMULATION PARAMETERS                                   ## 
+#############################################################
+
+
+topology      ../../files/07-constant_ph/MARTINI-CpH.rtf
+cphConfigFile ../../files/07-constant_ph/MARTINI-CpH_W.json
+ConstantCharge on
+
+
+# Input
+paraTypeCharmm      on
+parameters          ../../Fmoc/Fmoc.par
+parameters          ../../files/04-cgc-top-par-files/martini-par/martini-protein-bonds.par
+parameters          ../../files/04-cgc-top-par-files/martini-par/martini-protein-angles-cos.par
+parameters          ../../files/04-cgc-top-par-files/martini-par/martini-protein-dihedrals.par
+parameters          ../../files/04-cgc-top-par-files/martini-par/martini-all-nonb.par
+parameters 	        ../../files/04-cgc-top-par-files/martini-par/martini-lipids-bonds-angles-dihedrals.par	
+
+
+# Force-Field Parameters
+exclude             1-2
+1-4scaling          1.0
+cutoff              12.0
+martiniSwitching    on
+PME                 off
+switching           on
+switchdist          10.0
+pairlistdist        14
+dielectric 	        15
+
+# Integrator Parameters
+timestep            20.0 # remember this is MARTINI
+nonbondedFreq       1 
+stepspercycle       10
+
+
+langevin            yes  ;# do langevin dynamics
+langevinDamping     1     ;# damping coefficient(gamma)5/ps 
+langevinTemp        $temperature
+langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+
+
+margin 5.0
+
+# Constant Pressure Control (variable volume)
+useGroupPressure      no 
+useFlexibleCell       no 
+useConstantArea       no 
+useConstantRatio      no 
+
+wrapAll             on #keep molecules continuous in output dcd coords over a periodic boundary
+
+
+# Nose-Hoover ?
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+##one may need to bump up the pressure constants at first
+langevinPistonPeriod  2000.  #usually 2000 
+langevinPistonDecay   1000.  #usually 1000
+langevinPistonTemp    $temperature
+
+# Output
+outputName          $outputname
+
+restartfreq          1000   
+dcdfreq              1000
+xstFreq              1000
+outputEnergies       1000
+outputPressure       1000
+
+
+#############################################################
+## EXTRA PARAMETERS                                        ##
+#############################################################
+
+
+#############################################################
+## EXECUTION SCRIPT                                        ##
+#############################################################
+
+
+
+
+pH                   3.1
+#cphNumMinSteps       1000 ;# namdcph specific minimization, due to different psf setup cannot use regular minimize
+cphNumstepsPerSwitch 100
+
+#cphMaxProposalAttempts 300
+#cphSetResiduepKai XHS:801:LYS 3.0
+
+cphSetResidueState XHS:801:LYS D
+cphSetResidueState XHT:805:LYS D
+
+
+cphProposalWeight XHS:801:LYS 1000
+
+cphRun 1000 10000 ;# (15*5000*10000)/1000/1000 = 750 ns

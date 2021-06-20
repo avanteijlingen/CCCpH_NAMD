@@ -1,0 +1,63 @@
+27   1
+
+MASS	-1 C1	 72.0
+MASS	-1 QaL	 72.0
+MASS	-1 C3C	 72.0
+MASS	-1 P3 	 72.0
+MASS	-1 P3C 	 72.0
+MASS	-1 QAC 	 72.0
+MASS	-1 SC4f	 72.0
+
+MASS	-1 Qae	 72.0
+MASS	-1 P1e 	 72.0
+
+MASS	-1 Qad	 72.0
+MASS	-1 P3d 	 72.0
+
+MASS	-1 P5C 	 72.0
+MASS	-1 C3K 	 72.0
+MASS	-1 QDK 	 72.0
+MASS	-1 P1K 	 72.0
+
+MASS	-1 QDC 	 72.0
+MASS	-1 C5M 	 72.0
+
+MASS	-1 NAC 	 72.0
+MASS	-1 P4C 	 72.0
+MASS	-1 QAC 	 72.0
+
+MASS	-1 N0R 	 72.0
+MASS	-1 QDR 	 72.0
+MASS	-1 P4R 	 72.0
+
+# replace Qae with P3 for protonated end grop
+
+
+!==============================================================================
+! Oleic acid - states: D, 1
+!==============================================================================
+PRES OLE1         0.00  ! protonated OLE
+ATOM COO   P3    0.00  !    |
+BOND  COO C1  
+ANGLE COO C1 C2  
+DIHE COO C1 C2 C3 
+
+PRES OLEH1         0.00 ! protonated OLE, proton @OE1, dummy proton @OE2
+ATOM COO1   P3    0.00  !    |
+BOND  COO1 C1 
+ANGLE COO1 C1 C2   
+DIHE COO1 C1 C2 C3 
+
+PRES OLED        -1.00 ! deprotonated OLE
+ATOM COO   QAL   -1.00  !    |
+BOND  COO C1 
+ANGLE COO C1 C2   
+DIHE COO C1 C2 C3 
+
+PRES OLEHD        -1.00 ! deprotonated OLE
+ATOM COO1   QAL   -1.00  !    |
+BOND  COO1 C1 
+ANGLE COO1 C1 C2   
+DIHE COO1 C1 C2 C3 
+
+END

@@ -1,0 +1,508 @@
+27   1
+
+MASS	-1 C1	 72.0
+MASS	-1 QaL	 72.0
+MASS	-1 C3C	 72.0
+MASS	-1 P3 	 72.0
+MASS	-1 P3C 	 72.0
+MASS	-1 QAC 	 72.0
+MASS	-1 SC4f	 72.0
+
+MASS	-1 Qae	 72.0
+MASS	-1 P1e 	 72.0
+
+MASS	-1 Qad	 72.0
+MASS	-1 P3d 	 72.0
+
+MASS	-1 P5C 	 72.0
+MASS	-1 C3K 	 72.0
+MASS	-1 QDK 	 72.0
+MASS	-1 P1K 	 72.0
+
+MASS	-1 QDC 	 72.0
+MASS	-1 C5M 	 72.0
+
+MASS	-1 NAC 	 72.0
+MASS	-1 P4C 	 72.0
+MASS	-1 QAC 	 72.0
+
+MASS	-1 N0R 	 72.0
+MASS	-1 QDR 	 72.0
+MASS	-1 P4R 	 72.0
+
+# replace Qae with P3 for protonated end grop
+
+!==============================================================================
+! CG sidechain patches
+!==============================================================================
+!
+!     Constant pH simulations in NAMD make use of a mixed single/dual
+! coordinate system whereby titration moves take place through an auxillary
+! coordinate set for each sidechain. This works because the standard force
+! field is also supplemented by dummy atoms such that all protonation states
+! have the same atom count. Two kinds of patches are required:
+!
+! 1) state patches, which convert standard PRESdue topologies to their dummy
+!   atom containing equivalent. These have the naming pattern XXXY, where XXX
+!   is the normal force field amino acid name and Y is the state label.
+!
+! 2) hybrid patches, which create a duplicate sidechain in order to enable a
+!   transition between two protonation states. These have the naming pattern 
+!   XXXHY, where the letter "H" just gives the "hybrid" designation.
+!
+! In general, state patches only need to be used during initialization. Because
+! they add bonds that might already exist, these should be used with caution.
+! If the state of a sidechain is to be changed, the best approach is to use a
+! hybrid patch, copy over the coordinates, velocities, and atom names and then
+! delete the original atoms. This is especially important when dealing with
+! improper torsion terms.
+!
+
+!==============================================================================
+! Glutamate - states: D, 1
+!==============================================================================
+PRES GLU1         0.00  ! protonated GLU
+ATOM  BAS   P5C    0.00  !    |
+ATOM  SID   P1e    0.00  !   BAS-SID
+BOND  BAS SID  BAS +BAS !    |
+BOND  BAS +BAS !    
+ANGLE -BAS BAS SID      !
+ANGLE -BAS BAS +BAS     !
+DIHE -BAS BAS +BAS #BAS !
+
+PRES GLUH1         0.00 ! protonated GLU, proton @OE1, dummy proton @OE2
+ATOM BAS1   P5C    0.00  !    |
+ATOM SID1   P1e    0.00  !   BAS-SID
+BOND  BAS1 SID1  
+BOND  -BAS BAS1  BAS1 +BAS  
+ANGLE -BAS1 BAS1 SID1      !
+ANGLE -BAS1 BAS1 +BAS1     !
+DIHE -BAS1 BAS1 +BAS1 #BAS1 !
+
+PRES GLUD        -1.00 ! deprotonated GLU
+ATOM BAS   P5C     0.00 !    |
+ATOM SID   Qae    -1.00 !   BAS-SID
+BOND  BAS SID  BAS +BAS !    
+BOND  BAS +BAS !    
+ANGLE -BAS BAS SID      !
+ANGLE -BAS BAS +BAS     !
+DIHE -BAS BAS +BAS #BAS !
+
+PRES GLUHD        -1.00 ! deprotonated GLU
+ATOM BAS1   P5C     0.00 !    |
+ATOM SID1   Qae    -1.00 !   BAS-SID
+BOND  BAS1 SID1 
+BOND  -BAS BAS1  BAS1 +BAS
+ANGLE -BAS BAS1 SID1      !
+ANGLE -BAS BAS1 +BAS     !
+DIHE -BAS BAS1 +BAS #BAS !
+
+
+!==============================================================================
+! Aspartic acid - states: D, 1
+!==============================================================================
+PRES ASP1         0.00  ! protonated ASP
+ATOM  SID   P1e    0.00  !   BAS-SID
+BOND  BAS SID  
+ANGLE -BAS BAS SID      !
+
+
+PRES ASPH1         0.00 ! protonated ASP, proton @OE1, dummy proton @OE2
+ATOM SID1   P3d    0.00  !   BAS-SID
+BOND  BAS SID1  
+ANGLE -BAS BAS SID1      !
+
+
+PRES ASPD        -1.00 ! deprotonated GLU
+ATOM SID   Qae    -1.00 !   BAS-SID
+BOND  BAS SID 
+ANGLE -BAS BAS SID      !
+
+PRES ASPHD        -1.00 ! deprotonated GLU
+ATOM SID1   Qae    -1.00 !   BAS-SID
+BOND  BAS SID1 
+ANGLE -BAS BAS SID1      !
+
+
+
+!==============================================================================
+! ASP CTER - states: 
+!==============================================================================
+PRES ASPCP          0.00 !
+ATOM BAS   P3C     0.00 !    |
+ATOM SID   P3d     0.00 !    |
+BOND -BAS BAS
+BOND BAS SID
+ANGLE -BAS BAS SID
+
+PRES ASPCHP          0.00 !
+ATOM BAS1   P3C     0.00 !    |
+ATOM SID1   P3d     0.00 !    |
+BOND -BAS BAS1
+BOND BAS1 SID1
+ANGLE -BAS BAS1 SID1
+
+PRES ASPCC         -1.00 !
+ATOM BAS   QAC    -1.00 !    |
+ATOM SID   P3d     0.00 !    |
+BOND -BAS BAS
+BOND BAS SID
+ANGLE -BAS BAS SID
+
+PRES ASPCHC         -1.00 !
+ATOM BAS1   QAC    -1.00 !    |
+ATOM SID1   P3d     0.00 !    |
+BOND -BAS BAS1
+BOND BAS1 SID1
+ANGLE -BAS BAS1 SID1
+
+PRES ASPCCC        -1.00 !
+ATOM BAS   QAC    -1.00 !    |
+ATOM SID   P3d     0.00 !    |
+BOND -BAS BAS
+BOND BAS SID
+ANGLE -BAS BAS SID
+
+PRES ASPCHCC         -1.00 !
+ATOM BAS1   QAC    -1.00 !    |
+ATOM SID1   P3d     0.00 !    |
+BOND -BAS BAS1
+BOND BAS1 SID1
+ANGLE -BAS BAS1 SID1
+
+PRES ASPCD        -2.00 !
+ATOM BAS   QAC    -1.00 !    |
+ATOM SID   QAD    -1.00 !    |
+BOND -BAS BAS
+BOND BAS SID
+ANGLE -BAS BAS SID
+
+PRES ASPCHD        -2.00 !
+ATOM BAS1   QAC    -1.00 !    
+ATOM SID1   QAD    -1.00 !    |
+BOND -BAS BAS1
+BOND BAS1 SID1
+ANGLE -BAS BAS1 SID1
+
+
+
+!==============================================================================
+! Lysine - states: D, 1
+!==============================================================================
+PRES LYS1         1.00  ! protonated Lys (charged)
+GROUP 
+ATOM SI2   QDK    1.00  !   
+BOND  SI1 SI2  !    
+ANGLE BAS SI1 SI2     !
+
+PRES LYSH1         1.00  ! protonated Lys (charged)
+GROUP
+ATOM SI21   QDK    1.00  !   
+BOND  SI1 SI21  !    
+ANGLE BAS SI1 SI21     !
+
+PRES LYSD         0.00  ! Deprotonated Lys
+GROUP
+ATOM SI2   P1K    0.00  !   
+BOND  SI1 SI2  !    
+ANGLE BAS SI1 SI2     !
+
+PRES LYSHD         0.00  ! Deprotonated Lys
+GROUP 
+ATOM SI21   P1K    0.00  !   
+BOND  SI1 SI21  !    
+ANGLE BAS SI1 SI21     !
+
+!==============================================================================
+! ARGinine - states: D, 1
+!==============================================================================
+PRES ARG1         1.00  ! protonated ARG (charged)
+GROUP
+ATOM BAS   P5C    0.00  !    
+ATOM SI1   N0R    0.00  !   
+ATOM SI2   QDR    1.00  !   
+BOND  BAS SI1  SI1 SI2  !    
+BOND  BAS +BAS !    
+ANGLE -BAS BAS SI1      !
+ANGLE BAS +BAS +SI1      !
+ANGLE BAS +BAS +SI1      !
+ANGLE BAS SI1 SI2     !
+ANGLE -BAS BAS +BAS     !
+ANGLE  BAS +BAS #BAS    !
+DIHE -BAS BAS +BAS #BAS !
+
+
+PRES ARGH1         1.00  ! protonated ARG (charged)
+GROUP
+ATOM BAS1   P5C    0.00  !    
+ATOM SI11   N0r    0.00  !   
+ATOM SI21   QDR    1.00  !   
+BOND  BAS1 SI11  SI11 SI21  !   
+BOND  -BAS BAS1  BAS1 +BAS
+ANGLE BAS1 SI11 SI21     !
+ANGLE -BAS BAS1 +BAS     !
+ANGLE  BAS1 +BAS +SI1      !
+ANGLE -BAS BAS1 SI1      !
+ANGLE -SI1 -BAS BAS1 
+ANGLE  BAS1 +BAS #BAS    !
+DIHE -BAS BAS1 +BAS #BAS !
+
+PRES ARGD         0.00  ! Deprotonated ARG
+GROUP
+ATOM BAS   P5C    0.00  !    
+ATOM SI1   N0r    0.00  !   
+ATOM SI2   P4R    0.00  !   
+BOND  BAS SI1  SI1 SI2  !    
+BOND  BAS +BAS !    
+ANGLE BAS SI1 SI2     !
+ANGLE -BAS BAS +BAS     !
+ANGLE  BAS +BAS +SI1      !
+ANGLE -SI1 -BAS BAS
+ANGLE  BAS +BAS #BAS    !
+DIHE -BAS BAS +BAS #BAS !
+
+PRES ARGHD         0.00  ! Deprotonated ARG
+GROUP
+ATOM BAS1   P5C    0.00  !    
+ATOM SI11   N0r    0.00  !   
+ATOM SI21   P4R    0.00  !   
+BOND  BAS1 SI11  SI11 SI21  !  
+BOND  -BAS BAS1  BAS1 +BAS
+ANGLE BAS1 SI11 SI21     !
+ANGLE -BAS BAS1 +BAS     !
+ANGLE BAS1 +BAS +SI1      !
+ANGLE -SI1 -BAS BAS1 
+ANGLE  BAS1 +BAS #BAS    !
+DIHE -BAS BAS1 +BAS #BAS !
+
+
+!==============================================================================
+! Methionine NTER - states: D, 1
+!==============================================================================
+PRES MET1         1.00  ! protonated Met (charged)
+ATOM BAS   QDC    1.00  !    
+ATOM SID   C5M    0.00  !      
+BOND  BAS SID     BAS +BAS !   
+ANGLE -BAS BAS +BAS     !
+ANGLE -BAS BAS SID      !
+DIHE -BAS BAS +BAS #BAS !
+
+
+PRES METH1         1.00  ! protonated Met (charged)
+ATOM BAS1   QDC    1.00  !    
+ATOM SID1   C5M    0.00  !   
+BOND  BAS1 SID1 
+BOND  BAS1 +BAS !     
+ANGLE -BAS BAS1 SID1      !
+ANGLE -BAS BAS1 +BAS     !
+DIHE -BAS BAS1 +BAS #BAS !
+
+PRES METD         0.00  ! Deprotonated Met
+ATOM BAS   P5C    0.00  !    
+ATOM SID   C5M    0.00  !   
+BOND  BAS SID 
+BOND  BAS +BAS !    
+ANGLE -BAS BAS SID      !
+ANGLE -BAS BAS +BAS     !
+DIHE -BAS BAS +BAS #BAS !
+
+PRES METHD         0.00  ! Deprotonated Met
+ATOM BAS1   P5C    0.00  !    
+ATOM SID1   C5M    0.00  !   
+BOND  BAS1 SID1 
+BOND  BAS1 +BAS !      
+ANGLE -BAS BAS1 SID1      !
+ANGLE -BAS BAS1 +BAS     !
+DIHE -BAS BAS1 +BAS #BAS !
+
+
+!==============================================================================
+! GLXcine CTER - states: D, 1
+!==============================================================================
+PRES GLX1         0.00  ! protonated GLX (NOT charged)
+ATOM  BAS   P3C     0.00  !    |
+BOND  -BAS BAS          !   BAS
+
+PRES GLXH1         0.00  ! protonated GLX (NOT charged)
+ATOM BAS1   P3C    0.00  !    |
+BOND  -BAS BAS1          !   BAS
+
+PRES GLXD         -1.00  ! Deprotonated GLX
+ATOM BAS   QAC    -1.00  !    |
+BOND  -BAS BAS          !   BAS
+
+
+PRES GLXHD         -1.00  ! Deprotonated GLX
+ATOM   BAS1  QAC    -1.00  !    |
+BOND  -BAS   BAS1          !   BAS
+
+
+
+!==============================================================================
+! Oleic acid - states: D, 1
+!==============================================================================
+PRES OLE1         0.00  ! protonated OLE
+ATOM COO   P3    0.00  !    |
+BOND  COO C1  
+ANGLE COO C1 C2  
+
+PRES OLEH1         0.00 ! protonated OLE, proton @OE1, dummy proton @OE2
+ATOM COO1   P3    0.00  !    |
+BOND  COO1 C1 
+ANGLE COO1 C1 C2   
+
+PRES OLED        -1.00 ! deprotonated OLE
+ATOM COO   QAL   -1.00  !    |
+BOND  COO C1 
+ANGLE COO C1 C2   
+
+PRES OLEHD        -1.00 ! deprotonated OLE
+ATOM COO1   QAL   -1.00  !    |
+BOND  COO1 C1 
+ANGLE COO1 C1 C2   
+
+!==============================================================================
+! POPC - states: D, 1
+!==============================================================================
+PRES  POPC1         0.00  ! protonated POPC
+ATOM  PO4   P3    0.00  !    |
+BOND  CHO PO4 PO4 GL1  
+ANGLE PO4 GL1 GL2  
+
+PRES  POPCH1         0.00 ! protonated POPC, proton @OE1, dummy proton @OE2
+ATOM  PO41   P3    0.00  !    |
+BOND  CHO PO41 PO41 GL1 
+ANGLE PO41 GL1 GL2   
+
+PRES  POPCD        -1.00 ! deprotonated POPC
+ATOM  PO4   QAL   -1.00  !    |
+BOND  CHO PO4 PO4 GL1 
+ANGLE PO4 GL1 GL2   
+
+PRES  POPCHD        -1.00 ! deprotonated POPC
+ATOM  PO41   QAL   -1.00  !    |
+BOND  CHO PO41 PO41 GL1 
+ANGLE PO41 GL1 GL2   
+
+
+
+
+!==============================================================================
+! PHE-titratable - states: D, 1
+!==============================================================================
+PRES FTD        -1.00 !            - SI2
+ATOM BAS   QAC   -1.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS +BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+PRES FTHD        -1.00 !            - SI2
+ATOM BAS1   QAC   -1.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 +BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+ANGLE BAS1 SI1 SI3      !
+IMPR BAS1 SI2 SI3 SI1
+
+
+PRES FT1        0.00 !            - SI2
+ATOM BAS   P3C    0.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS +BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+
+PRES FTH1        0.00 !            - SI2
+ATOM BAS1   P3C    0.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 +BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+
+!==============================================================================
+! PHE-NTER titratable - states: D, 1
+!==============================================================================
+PRES PHEN1        1.00 !            - SI2
+ATOM BAS   QDC   1.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS +BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+PRES PHENH1        1.00 !            - SI2
+ATOM BAS1   QDC   1.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 +BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+ANGLE BAS1 SI1 SI3      !
+IMPR BAS1 SI2 SI3 SI1
+
+
+PRES PHEND       0.00 !            - SI2
+ATOM BAS   NaC    0.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS +BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+
+PRES PHENHD        0.00 !            - SI2
+ATOM BAS1   NaC    0.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 +BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+ANGLE BAS SI1 SI3      !
+IMPR BAS SI2 SI3 SI1
+
+
+!==============================================================================
+! PHE-CTER titratable - states: D, 1
+!==============================================================================
+
+PRES PHEC1        0.00 !            - SI2
+ATOM  BAS   P5C    0.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS -BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR  BAS SI2 SI3 SI1
+
+PRES PHECH1        0.00 !            - SI2
+ATOM  BAS1   P5C    0.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 -BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+IMPR  BAS1 SI2 SI3 SI1
+
+
+PRES PHECD       -1.00 !            - SI2
+ATOM  BAS   QAC   -1.00 !    |     /   |
+BOND  BAS SI1          !
+BOND  BAS -BAS         !
+ANGLE BAS SI1 SI2      !
+ANGLE BAS SI1 SI3      !
+IMPR  BAS SI2 SI3 SI1
+
+PRES PHECHD       -1.00 !            - SI2
+ATOM  BAS1  QAC   -1.00 !    |     /   |
+BOND  BAS1 SI1          !
+BOND  BAS1 -BAS
+ANGLE BAS1 SI1 SI2      !
+ANGLE BAS1 SI1 SI3      !
+IMPR  BAS1 SI2 SI3 SI1
+
+
+END
