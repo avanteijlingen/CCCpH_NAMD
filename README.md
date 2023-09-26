@@ -7,7 +7,7 @@ The *Journal of Physical Chemistry Letters* 2022 13 (18), 4046-4051
 DOI: https://doi.org/10.1021/acs.jpclett.2c00544
 
 
-![Abstract.png](.\Abstract.png)
+![Abstract.png](Abstract.png)
 
 ## Description
 
