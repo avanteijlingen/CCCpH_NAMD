@@ -56,3 +56,66 @@ MOLECULE DESTROYED BY FATAL ERROR!  Use resetpsf to start over.
 ```
 
 Your atom labels in your psf file dont match exactly the atom labels in the atom labels in your cphConfigFile and/or topology .rtf file.
+
+
+Something that looks like this:
+``` tcl
+FATAL ERROR: ERROR: failed to apply patch
+MOLECULE DESTROYED BY FATAL ERROR!  Use resetpsf to start over.
+    while executing
+"patch [cphSystem get statePatch $segresidname] "$segid:$resid""
+    (procedure "initializeSystem" line 34)
+    invoked from within
+"initializeSystem {*}$args"
+    ("initialize" arm line 2)
+    invoked from within
+"switch -nocase -- $action {
+        get {
+            cphSystemGet {*}$args
+        }
+        set {
+            cphSystemSet {*}$args
+        }
+      ..."
+    (procedure "cphSystem" line 2)
+    invoked from within
+"cphSystem initialize $SystempH $temp $buildH $stateInfo"
+    (procedure "initialize" line 80)
+    invoked from within
+"initialize"
+    (procedure "cphRun" line 6)
+    invoked from within
+"cphRun 1000 30000 "
+    (file "CPHMD.inp" line 108)
+[Partition 0][Node 0] End of program
+```
+
+You are likely missing a MASS definition in your .rtf (in this case it is missing 'MASS 	-1  SP1y 45.0')
+``` tcl
+27   1
+
+MASS	-1  P5C 	72.0
+MASS	-1  SC4y	45.0 
+
+
+!==============================================================================
+! Tyrosine - states: D, 1 (1 = protonated)
+!==============================================================================
+PRES TYR1          0.00  !            - SI2
+ATOM BAS   P5C     0.00  !    |     /   |
+ATOM SI1   SC4y   0.00  !   BAS-SI1    |
+ATOM SI2   SC4y   0.00  !    |     \   |
+ATOM SI3   SP1y   0.00  !            - SI3
+BOND  BAS SI1           !
+BOND  SI1 SI2  SI1 SI3  SI2 SI3 !these should be constraints
+BOND  BAS +BAS
+ANGLE BAS SI1 SI2
+ANGLE BAS SI1 SI3
+ANGLE -BAS BAS SI1
+ANGLE -BAS BAS +BAS
+IMPR BAS SI2 SI3 SI1
+DIHE -BAS BAS +BAS #BAS ! taking this out as it will end up linking to the next peptide
+...
+
+END
+```
