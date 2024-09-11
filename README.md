@@ -119,3 +119,11 @@ DIHE -BAS BAS +BAS #BAS ! taking this out as it will end up linking to the next 
 
 END
 ```
+
+GLOBAL * COUNT
+
+``` bash
+BAD GLOBAL ANGLE COUNT(7199 INSTEAD OF 7200) ETC
+```
+
+In this specific example it means that the way your multicore processing has split up the box that 1/2 of the 3 atoms in a defined angle have move so far apart that the angle cannot be calculated. This is very unlikely to be because you have used too many cores, and far more likely to be that when you have regenerated your topology from your CpHMD .rtf file you have lost some of your bonds. Check the number of bonds in your namd.md.psf vs a regular non-CpHMD Box_psfgen.psf type topology and check they there is the same number of bonds and that these bonds are the same.
